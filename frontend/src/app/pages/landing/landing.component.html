@@ -1,0 +1,94 @@
+<div class="landing">
+
+  @if (!isLoggedIn) {
+    <section class="hero">
+      <div class="hero__bg-glow"></div>
+      <div class="hero__content">
+        <div class="hero__badge">🇭🇺 Magyar autóalkatrész piac</div>
+        <h1 class="hero__title">
+          Használt alkatrészek,<br>
+          <span class="hero__title--accent">megbízható áron</span>
+        </h1>
+        <p class="hero__subtitle">
+          Vásárolj és adj el használt autóalkatrészeket egyszerűen.<br>
+          Karosszéria, motor, futómű és elektronikai alkatrészek egy helyen.
+        </p>
+        <div class="hero__actions">
+          <button class="hero__btn hero__btn--primary" (click)="goToProducts()">
+            Böngészés →
+          </button>
+          <button class="hero__btn hero__btn--outline" (click)="goToRegister()">
+            Ingyenes regisztráció
+          </button>
+        </div>
+        <div class="hero__login">
+          Már van fiókod?
+          <a class="hero__login-link" (click)="goToLogin()">Bejelentkezés →</a>
+        </div>
+        <p class="hero__note">Regisztráció nélkül is böngészhetsz · Feltöltés ingyenes</p>
+      </div>
+    </section>
+  }
+
+  <section class="categories">
+    <div class="categories__container">
+      <h2 class="categories__title">Kategóriák</h2>
+      <p class="categories__subtitle">Válassz a négy fő kategória közül</p>
+      <div class="categories__grid">
+        @for (cat of categories; track cat.label) {
+          <div class="cat-card" (click)="goToProducts(cat.category)">
+            <div class="cat-card__icon" [style.background]="cat.color + '1a'">
+              <span>{{ cat.icon }}</span>
+            </div>
+            <h3 class="cat-card__title">{{ cat.label }}</h3>
+            <p class="cat-card__desc">{{ cat.description }}</p>
+            <span class="cat-card__link" [style.color]="cat.color">Böngészés →</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  @if (!isLoggedIn) {
+    <section class="how">
+      <div class="how__container">
+        <h2 class="how__title">Hogyan működik?</h2>
+        <div class="how__steps">
+          <div class="how__step">
+            <div class="how__step-num">1</div>
+            <h3>Regisztrálj</h3>
+            <p>Hozz létre egy ingyenes fiókot email címeddel</p>
+          </div>
+          <div class="how__arrow">→</div>
+          <div class="how__step">
+            <div class="how__step-num">2</div>
+            <h3>Töltsd fel</h3>
+            <p>Add meg az alkatrész adatait, árát és egy fotót</p>
+          </div>
+          <div class="how__arrow">→</div>
+          <div class="how__step">
+            <div class="how__step-num">3</div>
+            <h3>Add el</h3>
+            <p>A vásárló megtalálja és megveszi a hirdetésedet</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="cta__container">
+        <h2 class="cta__title">Készen állsz?</h2>
+        <p class="cta__subtitle">Csatlakozz és töltsd fel felesleges alkatrészeidet még ma</p>
+        <div class="cta__actions">
+          <button class="hero__btn hero__btn--primary" (click)="goToRegister()">
+            Regisztráció →
+          </button>
+          <button class="hero__btn hero__btn--outline" (click)="goToProducts()">
+            Böngészés
+          </button>
+        </div>
+      </div>
+    </section>
+  }
+
+</div>

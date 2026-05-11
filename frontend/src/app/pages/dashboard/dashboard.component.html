@@ -1,0 +1,75 @@
+<div class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-header__title">Saját hirdetéseim</h1>
+        <p class="dashboard-header__email">{{ userEmail }}</p>
+      </div>
+      <button class="dashboard-header__btn" (click)="router.navigate(['/upload'])">
+        + Új hirdetés
+      </button>
+    </div>
+
+    @if (loading) {
+      <div class="loading">
+        <div class="loading__spinner"></div>
+        <span>Betöltés...</span>
+      </div>
+    } @else if (products.length === 0) {
+      <div class="empty-state">
+        <span class="empty-state__icon">📋</span>
+        <h3>Még nincs hirdetésed</h3>
+        <p>Töltsd fel az első alkatrészedet!</p>
+        <button class="empty-state__btn" (click)="router.navigate(['/upload'])">
+          Hirdetés feltöltése
+        </button>
+      </div>
+    } @else {
+      <div class="stats-bar">
+        <div class="stats-bar__item">
+          <span class="stats-bar__value">{{ products.length }}</span>
+          <span class="stats-bar__label">Aktív hirdetés</span>
+        </div>
+      </div>
+
+      <div class="product-table">
+        <div class="product-table__header">
+          <span>Hirdetés</span>
+          <span>Kategória</span>
+          <span>Ár</span>
+          <span>Feltöltve</span>
+          <span>Műveletek</span>
+        </div>
+
+        @for (product of products; track product.id) {
+          <div class="product-table__row">
+            <div class="product-table__product">
+              @if (product.imageUrl) {
+                <img class="product-table__thumb" [src]="product.imageUrl" [alt]="product.title"
+                  (error)="$any($event.target).style.display='none'" />
+              } @else {
+                <div class="product-table__thumb product-table__thumb--placeholder">🔧</div>
+              }
+              <span class="product-table__title">{{ product.title }}</span>
+            </div>
+            <span class="product-table__badge">{{ categoryLabels[product.category] }}</span>
+            <span class="product-table__price">
+              {{ product.price | currency:'HUF':'symbol':'1.0-0':'hu' }}
+            </span>
+            <span class="product-table__date">
+              {{ product.createdAt | date:'yyyy.MM.dd' }}
+            </span>
+            <div class="product-table__actions">
+              <button class="product-table__btn product-table__btn--edit" (click)="onEdit(product)">
+                Szerkesztés
+              </button>
+              <button class="product-table__btn product-table__btn--delete" (click)="onDelete(product)">
+                Törlés
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

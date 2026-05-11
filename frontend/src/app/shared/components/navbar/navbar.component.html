@@ -1,0 +1,33 @@
+<nav class="navbar">
+  <div class="navbar__container">
+    <a class="navbar__brand" routerLink="/">
+      <span class="navbar__logo-icon">⚙</span>
+      <span class="navbar__logo-text">Drive<span class="accent">Store</span></span>
+    </a>
+
+    <button class="navbar__hamburger" (click)="toggleMenu()" [class.open]="menuOpen">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="navbar__menu" [class.open]="menuOpen">
+      <a class="navbar__link" routerLink="/products" routerLinkActive="active" (click)="menuOpen=false">
+        Hirdetések
+      </a>
+      @if (isLoggedIn) {
+        <a class="navbar__link" routerLink="/upload" routerLinkActive="active" (click)="menuOpen=false">
+          Feltöltés
+        </a>
+        <a class="navbar__link" routerLink="/dashboard" routerLinkActive="active" (click)="menuOpen=false">
+          Saját hirdetések
+        </a>
+        <div class="navbar__divider"></div>
+        <span class="navbar__email">{{ currentUser?.email }}</span>
+        <button class="navbar__btn navbar__btn--outline" (click)="logout()">Kilépés</button>
+      } @else {
+        <a class="navbar__btn navbar__btn--primary" routerLink="/auth" (click)="menuOpen=false">
+          Bejelentkezés
+        </a>
+      }
+    </div>
+  </div>
+</nav>

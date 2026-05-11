@@ -1,0 +1,50 @@
+<div class="products-page">
+  <div class="hero">
+    <div class="hero__content">
+      <h1 class="hero__title">Használt autóalkatrészek</h1>
+      <p class="hero__subtitle">Találd meg amit keresel, vagy add el ami felesleges</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="filter-bar">
+      <button
+        class="filter-bar__btn"
+        [class.active]="selectedCategory === null"
+        (click)="filterBy(null)">
+        Összes
+      </button>
+      @for (cat of categories; track cat) {
+        <button
+          class="filter-bar__btn"
+          [class.active]="selectedCategory === cat"
+          (click)="filterBy(cat)">
+          {{ categoryLabels[cat] }}
+        </button>
+      }
+    </div>
+
+    @if (loading) {
+      <div class="loading">
+        <div class="loading__spinner"></div>
+        <span>Betöltés...</span>
+      </div>
+    } @else if (products.length === 0) {
+      <div class="empty-state">
+        <span class="empty-state__icon">🔧</span>
+        <h3>Nincs hirdetés</h3>
+        <p>Ebben a kategóriában még nem töltöttek fel alkatrészt.</p>
+      </div>
+    } @else {
+      <div class="products-grid">
+        @for (product of products; track product.id) {
+          <app-product-card
+            [product]="product"
+            (buyClick)="onBuy($event)"
+            (editClick)="onEdit($event)"
+            (deleteClick)="onDelete($event)" />
+        }
+      </div>
+    }
+  </div>
+</div>

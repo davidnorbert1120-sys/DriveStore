@@ -1,0 +1,155 @@
+<div class="detail-page">
+  <div class="container">
+
+    @if (loading) {
+      <div class="loading">
+        <div class="loading__spinner"></div>
+        <span>Betöltés...</span>
+      </div>
+    } @else if (product) {
+
+      <button class="back-btn" (click)="router.navigate(['/products'])">← Vissza</button>
+
+      <div class="detail-card">
+        <div class="detail-card__image-wrap">
+          @if (product.imageUrl && !imageError) {
+            <img class="detail-card__image" [src]="product.imageUrl" [alt]="product.title"
+              (error)="imageError = true" (click)="lightboxOpen = true" />
+            <span class="detail-card__zoom-hint">🔍 Kattints a nagyításhoz</span>
+          } @else {
+            <div class="detail-card__image-placeholder">
+              <span>{{ categoryIcons[product.category] }}</span>
+            </div>
+          }
+          <span class="detail-card__badge">{{ categoryLabels[product.category] }}</span>
+        </div>
+
+        <div class="detail-card__info">
+          <h1 class="detail-card__title">{{ product.title }}</h1>
+          <p class="detail-card__price">{{ product.price | currency:'HUF':'symbol':'1.0-0' }} Ft</p>
+
+          <div class="detail-card__meta">
+            <div class="detail-card__meta-row">
+              <span class="detail-card__meta-label">Eladó</span>
+              <span class="detail-card__meta-value">{{ product.userEmail }}</span>
+            </div>
+            <div class="detail-card__meta-row">
+              <span class="detail-card__meta-label">Feltöltve</span>
+              <span class="detail-card__meta-value">{{ getFormattedDate() }}</span>
+            </div>
+            <div class="detail-card__meta-row">
+              <span class="detail-card__meta-label">Kategória</span>
+              <span class="detail-card__meta-value">{{ categoryLabels[product.category] }}</span>
+            </div>
+          </div>
+
+          <div class="detail-card__actions">
+            @if (isOwner) {
+              <button class="detail-card__btn detail-card__btn--secondary" (click)="onEdit()">Szerkesztés</button>
+              <button class="detail-card__btn detail-card__btn--danger" (click)="onDelete()">Törlés</button>
+            } @else if (isLoggedIn) {
+              <button class="detail-card__btn detail-card__btn--primary" (click)="onBuy()">Megveszem</button>
+              <button class="detail-card__btn detail-card__btn--secondary" (click)="openChat()">Üzenet az eladónak</button>
+            } @else {
+              <button class="detail-card__btn detail-card__btn--primary" (click)="router.navigate(['/auth'])">
+                Bejelentkezés a vásárláshoz
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (isLoggedIn) {
+        <div class="chat-section">
+
+          @if (isOwner) {
+            <div class="chat-owner">
+              <div class="chat-owner__sidebar">
+                <h2 class="chat-owner__sidebar-title">Üzenetek</h2>
+                @if (messagesLoading) {
+                  <p class="chat-owner__loading">Betöltés...</p>
+                } @else if (conversationPartners.length === 0) {
+                  <p class="chat-owner__empty">Még nem írt senki.</p>
+                } @else {
+                  @for (partner of conversationPartners; track partner.userId) {
+                    <button class="chat-owner__partner"
+                      [class.chat-owner__partner--active]="selectedPartner?.userId === partner.userId"
+                      (click)="selectPartner(partner)">
+                      <span class="chat-owner__partner-avatar">{{ partner.email[0].toUpperCase() }}</span>
+                      <span class="chat-owner__partner-email">{{ partner.email }}</span>
+                    </button>
+                  }
+                }
+              </div>
+
+              <div class="chat-owner__thread">
+                @if (!selectedPartner) {
+                  <p class="chat-owner__select-hint">← Válassz egy beszélgetést</p>
+                } @else {
+                  <div class="chat-thread" #chatThread>
+                    @for (msg of threadMessages; track msg.id) {
+                      <div class="chat-msg" [class.chat-msg--own]="msg.senderEmail === currentUserEmail">
+                        <span class="chat-msg__sender">{{ msg.senderEmail === currentUserEmail ? 'Te' : msg.senderEmail }}</span>
+                        <div class="chat-msg__bubble">{{ msg.content }}</div>
+                        <span class="chat-msg__time">{{ formatMsgTime(msg.sentAt) }}</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="chat-input">
+                    <textarea class="chat-input__field" [(ngModel)]="newMessage"
+                      placeholder="Válasz..."
+                      (keydown.enter)="$event.preventDefault(); sendMessage()"
+                      rows="2"></textarea>
+                    <button class="chat-input__btn" (click)="sendMessage()"
+                      [disabled]="!newMessage.trim() || sendingMessage">
+                      Küldés
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+
+          } @else {
+            <h2 class="chat-section__title">Üzenet az eladónak</h2>
+            @if (messagesLoading) {
+              <div class="chat-loading">Betöltés...</div>
+            } @else {
+              <div class="chat-thread" #chatThread>
+                @if (allMessages.length === 0) {
+                  <p class="chat-empty">Még nincs üzenet. Írj az eladónak!</p>
+                }
+                @for (msg of allMessages; track msg.id) {
+                  <div class="chat-msg" [class.chat-msg--own]="msg.senderEmail === currentUserEmail">
+                    <span class="chat-msg__sender">{{ msg.senderEmail === currentUserEmail ? 'Te' : msg.senderEmail }}</span>
+                    <div class="chat-msg__bubble">{{ msg.content }}</div>
+                    <span class="chat-msg__time">{{ formatMsgTime(msg.sentAt) }}</span>
+                  </div>
+                }
+              </div>
+              <div class="chat-input">
+                <textarea class="chat-input__field" [(ngModel)]="newMessage"
+                  placeholder="Írj üzenetet..."
+                  (keydown.enter)="$event.preventDefault(); sendMessage()"
+                  rows="2"></textarea>
+                <button class="chat-input__btn" (click)="sendMessage()"
+                  [disabled]="!newMessage.trim() || sendingMessage">
+                  Küldés
+                </button>
+              </div>
+            }
+          }
+
+        </div>
+      }
+
+    }
+  </div>
+</div>
+
+@if (lightboxOpen) {
+  <div class="lightbox" (click)="lightboxOpen = false">
+    <button class="lightbox__close" (click)="lightboxOpen = false">✕</button>
+    <img class="lightbox__img" [src]="product!.imageUrl" [alt]="product!.title"
+      (click)="$event.stopPropagation()" />
+  </div>
+}

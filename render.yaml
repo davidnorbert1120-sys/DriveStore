@@ -1,0 +1,39 @@
+databases:
+  - name: drivestore-db
+    plan: free
+    databaseName: drivestore
+    user: drivestore
+
+services:
+  - type: web
+    name: drivestore-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /products
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: drivestore-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: drivestore-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: drivestore-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: drivestore-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: drivestore-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: "86400000"
+      - key: CORS_ORIGINS
+        sync: false

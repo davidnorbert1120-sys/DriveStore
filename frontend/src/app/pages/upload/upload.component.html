@@ -1,0 +1,92 @@
+<div class="upload-page">
+  <div class="container">
+    <div class="upload-card">
+      <div class="upload-card__header">
+        <h1 class="upload-card__title">
+          {{ editId ? 'Hirdetés szerkesztése' : 'Új hirdetés feltöltése' }}
+        </h1>
+        <p class="upload-card__subtitle">Töltsd fel a felesleges alkatrészeidet</p>
+      </div>
+
+      <div class="upload-layout">
+        <form class="upload-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="upload-form__field">
+            <label class="upload-form__label">Megnevezés *</label>
+            <input
+              class="upload-form__input"
+              type="text"
+              formControlName="title"
+              placeholder="pl. BMW E46 első lökhárító" />
+            @if (f['title'].touched && f['title'].errors?.['minlength']) {
+              <span class="upload-form__error">Legalább 3 karakter szükséges</span>
+            }
+          </div>
+
+          <div class="upload-form__row">
+            <div class="upload-form__field">
+              <label class="upload-form__label">Ár (Ft) *</label>
+              <input
+                class="upload-form__input"
+                type="number"
+                formControlName="price"
+                placeholder="25000"
+                min="1" />
+              @if (f['price'].touched && f['price'].errors?.['min']) {
+                <span class="upload-form__error">Az ár pozitív szám kell legyen</span>
+              }
+            </div>
+
+            <div class="upload-form__field">
+              <label class="upload-form__label">Kategória *</label>
+              <select class="upload-form__input upload-form__select" formControlName="category">
+                <option value="" disabled>Válassz kategóriát</option>
+                @for (cat of categories; track cat) {
+                  <option [value]="cat">{{ categoryLabels[cat] }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="upload-form__field">
+            <label class="upload-form__label">Kép feltöltése</label>
+            <label class="upload-form__file-label" [class.upload-form__file-label--loading]="uploadingImage">
+              <input
+                type="file"
+                accept="image/*"
+                class="upload-form__file-input"
+                (change)="onFileSelected($event)"
+                [disabled]="uploadingImage" />
+              <span class="upload-form__file-icon">📁</span>
+              <span>{{ uploadingImage ? 'Feltöltés...' : 'Kattints a képválasztáshoz' }}</span>
+            </label>
+            <span class="upload-form__hint">JPG, PNG, WEBP — max. 5 MB</span>
+          </div>
+
+          <div class="upload-form__actions">
+            <button type="button" class="upload-form__btn upload-form__btn--secondary"
+              (click)="router.navigate(['/dashboard'])">
+              Mégse
+            </button>
+            <button type="submit" class="upload-form__btn upload-form__btn--primary"
+              [disabled]="loading || form.invalid">
+              {{ loading ? 'Mentés...' : (editId ? 'Frissítés' : 'Feltöltés') }}
+            </button>
+          </div>
+        </form>
+
+        <div class="upload-preview">
+          <p class="upload-preview__label">Kép előnézet</p>
+          @if (imagePreview) {
+            <img class="upload-preview__image" [src]="imagePreview" alt="Előnézet"
+              (error)="imagePreview=''" />
+          } @else {
+            <div class="upload-preview__placeholder">
+              <span>🖼</span>
+              <p>Nincs kép</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

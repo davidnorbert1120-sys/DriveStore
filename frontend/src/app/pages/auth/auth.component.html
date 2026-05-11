@@ -1,0 +1,72 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <span class="auth-card__logo">⚙ Drive<span class="accent">Store</span></span>
+      <p class="auth-card__subtitle">Autóalkatrész hirdetések</p>
+    </div>
+
+    <div class="auth-card__tabs">
+      <button class="auth-card__tab" [class.active]="activeTab === 'login'" (click)="setTab('login')">
+        Bejelentkezés
+      </button>
+      <button class="auth-card__tab" [class.active]="activeTab === 'register'" (click)="setTab('register')">
+        Regisztráció
+      </button>
+    </div>
+
+    @if (error) {
+      <div class="auth-card__alert auth-card__alert--error">{{ error }}</div>
+    }
+    @if (success) {
+      <div class="auth-card__alert auth-card__alert--success">{{ success }}</div>
+    }
+
+    @if (activeTab === 'login') {
+      <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="auth-form__field">
+          <label class="auth-form__label">Email</label>
+          <input class="auth-form__input" type="email" formControlName="email" placeholder="pelda@email.com" />
+          @if (lf['email'].touched && lf['email'].errors?.['email']) {
+            <span class="auth-form__error">Érvényes email cím szükséges</span>
+          }
+        </div>
+
+        <div class="auth-form__field">
+          <label class="auth-form__label">Jelszó</label>
+          <input class="auth-form__input" type="password" formControlName="password" placeholder="••••••••" />
+          @if (lf['password'].touched && lf['password'].errors?.['required']) {
+            <span class="auth-form__error">A jelszó kötelező</span>
+          }
+        </div>
+
+        <button class="auth-form__submit" type="submit" [disabled]="loading || loginForm.invalid">
+          {{ loading ? 'Bejelentkezés...' : 'Bejelentkezés' }}
+        </button>
+      </form>
+    }
+
+    @if (activeTab === 'register') {
+      <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="onRegister()">
+        <div class="auth-form__field">
+          <label class="auth-form__label">Email</label>
+          <input class="auth-form__input" type="email" formControlName="email" placeholder="pelda@email.com" />
+          @if (rf['email'].touched && rf['email'].errors?.['email']) {
+            <span class="auth-form__error">Érvényes email cím szükséges</span>
+          }
+        </div>
+
+        <div class="auth-form__field">
+          <label class="auth-form__label">Jelszó</label>
+          <input class="auth-form__input" type="password" formControlName="password" placeholder="Min. 6 karakter" />
+          @if (rf['password'].touched && rf['password'].errors?.['minlength']) {
+            <span class="auth-form__error">Legalább 6 karakter szükséges</span>
+          }
+        </div>
+
+        <button class="auth-form__submit" type="submit" [disabled]="loading || registerForm.invalid">
+          {{ loading ? 'Regisztráció...' : 'Regisztráció' }}
+        </button>
+      </form>
+    }
+  </div>
+</div>

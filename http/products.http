@@ -1,0 +1,42 @@
+@token = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzc4MTQ4OTczLCJleHAiOjE3NzgyMzUzNzN9.HgzkGlMRdWzbdKzdZQp9YclAyEFnZf0cvgCWoW0DFIcXpESX1xaaAmdkMwvkmpHewRT9Y8St4v9qkTspTv1Lqw
+
+### Get all products
+GET http://localhost:8080/products
+
+### Get products by category
+GET http://localhost:8080/products?category=MOTOR
+
+### Get product by ID
+GET http://localhost:8080/products/1
+
+### Get my products (auth required)
+GET http://localhost:8080/products/my
+Authorization: Bearer {{token}}
+
+### Create product (auth required)
+POST http://localhost:8080/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "BMW E46 első lökhárító",
+  "price": 25000,
+  "category": "KAROSSZERIA",
+  "imageUrl": "https://example.com/image.jpg"
+}
+
+### Update product (auth required)
+PUT http://localhost:8080/products/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "BMW E46 első lökhárító - felújított",
+  "price": 20000,
+  "category": "KAROSSZERIA",
+  "imageUrl": "https://example.com/image.jpg"
+}
+
+### Delete product (buy / auth required)
+DELETE http://localhost:8080/products/1
+Authorization: Bearer {{token}}

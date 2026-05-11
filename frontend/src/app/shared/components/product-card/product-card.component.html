@@ -1,0 +1,27 @@
+<div class="card" (click)="goToDetail()">
+  <div class="card__image-wrap">
+    @if (product.imageUrl && !imageError) {
+      <img class="card__image" [src]="product.imageUrl" [alt]="product.title" (error)="onImageError()" />
+    } @else {
+      <div class="card__image-placeholder">
+        <span class="card__placeholder-icon">{{ categoryIcons[product.category] }}</span>
+      </div>
+    }
+    <span class="card__badge">{{ categoryLabels[product.category] }}</span>
+  </div>
+
+  <div class="card__body">
+    <h3 class="card__title">{{ product.title }}</h3>
+    <p class="card__price">{{ product.price | currency:'HUF':'symbol':'1.0-0':'hu' }}</p>
+    <p class="card__meta">{{ product.userEmail }} · {{ getTimeAgo() }}</p>
+  </div>
+
+  <div class="card__actions" (click)="$event.stopPropagation()">
+    @if (isOwner) {
+      <button class="card__btn card__btn--secondary" (click)="onEdit()">Szerkesztés</button>
+      <button class="card__btn card__btn--danger" (click)="onDelete()">Törlés</button>
+    } @else {
+      <button class="card__btn card__btn--primary" (click)="onBuy()">Megveszem</button>
+    }
+  </div>
+</div>
