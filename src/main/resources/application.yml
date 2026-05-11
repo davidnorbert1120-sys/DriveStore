@@ -2,7 +2,7 @@ spring:
   application:
     name: DriveStore
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:drivestore}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:drivestore}${DB_PARAMS:}
     username: ${DB_USERNAME:drivestore}
     password: ${DB_PASSWORD:drivestore}
     driver-class-name: org.postgresql.Driver
