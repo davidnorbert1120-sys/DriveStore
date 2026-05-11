@@ -20,12 +20,13 @@ Használt autóalkatrész piactér – full-stack webalkalmazás Spring Boot bac
 **Infra**
 - Docker + docker-compose (PostgreSQL)
 - Dockerfile multi-stage backend image
+- **Cloudinary** – CDN képtárolás (signed upload Java SDK-val)
 
 ## Funkciók
 
 - **Authentikáció** – regisztráció, bejelentkezés, JWT token (24h lejárat)
 - **Termékek** – feltöltés képpel, szerkesztés, törlés (csak saját), szűrés kategória szerint
-- **Képfeltöltés** – multipart, max 5 MB, jpg/png/webp/gif validáció
+- **Képfeltöltés** – multipart, max 5 MB, jpg/png/webp/gif validáció, **Cloudinary CDN-en tárolva**
 - **4 kategória** – karosszéria, motor, futómű, elektronika
 - **Real-time frissítés** – új/módosított/törölt termékek WebSocket-en azonnal megjelennek minden kliensnek
 - **Privát üzenetek** – vevő és eladó közötti chat termékhez kötve, eladói nézetben partner-listával
@@ -165,9 +166,8 @@ A `frontend/vercel.json` tartalmaz `rewrites`-okat, amik a `/api/*` és `/upload
 
 ### Production limitációk (known issues)
 
-- **Feltöltött képek (`uploads/`)** – jelenleg a backend lokális fájlrendszerébe mentődnek. Render free tier-en a konténer fájlrendszere ephemerális, tehát restart után a képek elvesznek. Production-höz Cloudinary / AWS S3 / Cloudflare R2 integráció szükséges.
 - **Render free tier cold start** – 15 perc inaktivitás után a service alszik, az első request 30-60 másodperc lehet.
-- **PostgreSQL free tier** – Render free Postgres 90 nap után expiry-zik.
+- **Neon free tier** – idle után pár másodperces cold start lehet az adatbázis első lekérdezésénél.
 
 ## Implementációs döntések
 

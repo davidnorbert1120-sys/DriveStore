@@ -1,27 +1,37 @@
 package com.drivestore.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.drivestore.exception.InvalidFileException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
+@Slf4j
 @Service
 public class FileStorageService {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif");
     private static final long MAX_SIZE = 5 * 1024 * 1024;
 
-    @Value("${app.upload.dir:uploads}")
-    private String uploadDir;
+    private final Cloudinary cloudinary;
+
+    public FileStorageService(@Value("${cloudinary.cloud-name}") String cloudName,
+                              @Value("${cloudinary.api-key}") String apiKey,
+                              @Value("${cloudinary.api-secret}") String apiSecret) {
+        this.cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret,
+                "secure", true
+        ));
+    }
 
     public String store(MultipartFile file) {
         if (file.isEmpty()) throw new InvalidFileException("A fájl üres");
@@ -33,15 +43,16 @@ public class FileStorageService {
         }
 
         try {
-            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-            Files.createDirectories(uploadPath);
-
-            String filename = UUID.randomUUID() + "." + ext.toLowerCase();
-            Files.copy(file.getInputStream(), uploadPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-
-            return "/uploads/" + filename;
+            Map<?, ?> result = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("folder", "drivestore")
+            );
+            String url = (String) result.get("secure_url");
+            log.info("Kép feltöltve Cloudinary-re: {}", url);
+            return url;
         } catch (IOException e) {
-            throw new RuntimeException("Fájl mentési hiba", e);
+            log.error("Cloudinary feltöltés sikertelen: {}", e.getMessage());
+            throw new RuntimeException("Kép feltöltési hiba", e);
         }
     }
 }

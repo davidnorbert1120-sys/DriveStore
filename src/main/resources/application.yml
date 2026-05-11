@@ -23,9 +23,12 @@ jwt:
   secret: ${JWT_SECRET:ZHJpdmVzdG9yZS1zZWNyZXQta2V5LW11c3QtYmUtYXQtbGVhc3QtMjU2LWJpdHM=}
   expiration: ${JWT_EXPIRATION:86400000}
 
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+
 app:
-  upload:
-    dir: ${UPLOAD_DIR:uploads}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
 

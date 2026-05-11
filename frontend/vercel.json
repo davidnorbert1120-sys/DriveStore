@@ -7,10 +7,6 @@
       "destination": "https://drivestore-api.onrender.com/:path*"
     },
     {
-      "source": "/uploads/:path*",
-      "destination": "https://drivestore-api.onrender.com/uploads/:path*"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
