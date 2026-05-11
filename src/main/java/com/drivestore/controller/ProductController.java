@@ -62,4 +62,12 @@ public class ProductController {
         productService.delete(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/buy")
+    public ResponseEntity<Void> buy(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        productService.buy(id, userDetails.getUsername());
+        return ResponseEntity.noContent().build();
+    }
 }

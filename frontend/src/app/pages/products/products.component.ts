@@ -89,7 +89,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     ref.afterClosed().subscribe(confirmed => {
       if (!confirmed) return;
-      this.productService.delete(product.id).subscribe({
+      this.productService.buy(product.id).subscribe({
         next: () => {
           console.log('ProductsComponent.onBuy successful for product:', product.title);
           this.snackBar.open('Vásárlás sikeres!', '✕', { duration: 3000, panelClass: 'snack-success' });

@@ -87,10 +87,21 @@ public class ProductService {
     public void delete(Long id, String email) {
         Product product = findProductOrThrow(id);
         checkOwnership(product, email);
-        ProductDto dto = toDto(product);
-        messageRepository.deleteByProductId(id);
-        productRepository.delete(product);
+        removeProduct(product);
         log.info("Hirdetés törölve: id={} '{}' – {}", id, product.getTitle(), email);
+    }
+
+    @Transactional
+    public void buy(Long id, String buyerEmail) {
+        Product product = findProductOrThrow(id);
+        removeProduct(product);
+        log.info("Hirdetés megvéve: id={} '{}' – vásárló: {}", id, product.getTitle(), buyerEmail);
+    }
+
+    private void removeProduct(Product product) {
+        ProductDto dto = toDto(product);
+        messageRepository.deleteByProductId(product.getId());
+        productRepository.delete(product);
         webSocketService.sendProductDeleted(dto);
     }
 

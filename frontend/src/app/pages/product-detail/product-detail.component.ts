@@ -1,14 +1,16 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subscription } from 'rxjs';
 import { CATEGORY_ICONS, CATEGORY_LABELS, Product } from '../../core/models/product.model';
 import { Message, ConversationPartner } from '../../core/models/message.model';
 import { ProductService } from '../../core/services/product.service';
 import { AuthService } from '../../core/services/auth.service';
 import { MessageService } from '../../core/services/message.service';
+import { WebsocketService } from '../../core/services/websocket.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -18,7 +20,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss'
 })
-export class ProductDetailComponent implements OnInit, AfterViewChecked {
+export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('chatThread') chatThread?: ElementRef;
 
   product: Product | null = null;
@@ -32,6 +34,7 @@ export class ProductDetailComponent implements OnInit, AfterViewChecked {
   sendingMessage = false;
   selectedPartner: ConversationPartner | null = null;
   private shouldScrollChat = false;
+  private wsSub?: Subscription;
 
   readonly categoryLabels = CATEGORY_LABELS;
   readonly categoryIcons = CATEGORY_ICONS;
@@ -42,6 +45,7 @@ export class ProductDetailComponent implements OnInit, AfterViewChecked {
     private productService: ProductService,
     private authService: AuthService,
     private messageService: MessageService,
+    private wsService: WebsocketService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
@@ -52,9 +56,28 @@ export class ProductDetailComponent implements OnInit, AfterViewChecked {
       next: p => {
         this.product = p;
         this.loading = false;
-        if (this.isLoggedIn) this.loadMessages();
+        if (this.isLoggedIn) {
+          this.loadMessages();
+          this.subscribeToIncomingMessages();
+        }
       },
       error: () => { this.loading = false; this.router.navigate(['/products']); }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.wsSub?.unsubscribe();
+    this.wsService.unsubscribeFromMessages();
+  }
+
+  private subscribeToIncomingMessages(): void {
+    if (!this.product) return;
+    this.wsService.connect();
+    this.wsService.subscribeToMessages(this.product.id, this.currentUserId);
+    this.wsSub = this.wsService.getMessageEvents().subscribe(msg => {
+      if (this.allMessages.some(m => m.id === msg.id)) return;
+      this.allMessages = [...this.allMessages, msg];
+      this.shouldScrollChat = true;
     });
   }
 
@@ -172,7 +195,7 @@ export class ProductDetailComponent implements OnInit, AfterViewChecked {
     });
     ref.afterClosed().subscribe(confirmed => {
       if (!confirmed || !this.product) return;
-      this.productService.delete(this.product.id).subscribe({
+      this.productService.buy(this.product.id).subscribe({
         next: () => {
           console.log('ProductDetailComponent.onBuy successful for product:', this.product?.title);
           this.snackBar.open('Sikeres vásárlás!', '✕', { duration: 3000, panelClass: 'snack-success' });

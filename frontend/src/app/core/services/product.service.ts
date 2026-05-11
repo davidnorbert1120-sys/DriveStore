@@ -42,6 +42,11 @@ export class ProductService {
     return this.http.delete<void>(`${this.BASE}/${id}`);
   }
 
+  buy(id: number): Observable<void> {
+    console.log('ProductService.buy called for id:', id);
+    return this.http.post<void>(`${this.BASE}/${id}/buy`, {});
+  }
+
   uploadImage(file: File): Observable<{ url: string }> {
     console.log('ProductService.uploadImage called:', file.name);
     const formData = new FormData();

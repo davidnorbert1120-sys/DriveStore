@@ -25,6 +25,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final MessageWebSocketService webSocketService;
 
     @Transactional(readOnly = true)
     public List<MessageDto> getByProduct(Long productId, String currentEmail) {
@@ -62,6 +63,7 @@ public class MessageService {
 
         MessageDto dto = toDto(messageRepository.save(message));
         log.info("Üzenet elküldve: productId={} – {} -> {}", request.productId(), senderEmail, receiver.getEmail());
+        webSocketService.sendToUser(product.getId(), receiver.getId(), dto);
         return dto;
     }
 
